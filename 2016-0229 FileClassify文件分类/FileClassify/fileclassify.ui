@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FileClassifyClass</class>
+ <widget class="QMainWindow" name="FileClassifyClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>FileClassify</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="7" column="4">
+     <widget class="QPushButton" name="pushButton_4">
+      <property name="text">
+       <string>开始分类</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>参数文件路径</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="4">
+     <widget class="QLineEdit" name="lineEdit_2"/>
+    </item>
+    <item row="1" column="4">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>产品路径</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="3">
+     <widget class="QLineEdit" name="lineEdit_3">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>50</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="4">
+     <widget class="QLineEdit" name="lineEdit"/>
+    </item>
+    <item row="6" column="0" colspan="5">
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>20</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="0">
+     <widget class="QCheckBox" name="checkBox">
+      <property name="text">
+       <string>是否建立二级文件夹</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="4">
+     <widget class="QPushButton" name="pushButton_5">
+      <property name="text">
+       <string>打开配置文件</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="3">
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>配置文件路径</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="fileclassify.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>inputFilePath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>522</x>
+     <y>18</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>596</x>
+     <y>37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>inputIniPath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>473</x>
+     <y>120</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>568</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>outputFilePath()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>554</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>593</x>
+     <y>86</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>runClassify()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>536</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>546</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>changeSubFlag(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>165</x>
+     <y>349</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>210</x>
+     <y>371</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_5</sender>
+   <signal>clicked()</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>openIni()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>533</x>
+     <y>106</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>556</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>inputFilePath()</slot>
+  <slot>inputIniPath()</slot>
+  <slot>outputFilePath()</slot>
+  <slot>runClassify()</slot>
+  <slot>changeSubFlag(bool)</slot>
+  <slot>openIni()</slot>
+ </slots>
+</ui>
