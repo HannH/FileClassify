@@ -7,6 +7,7 @@
 #include <string>
 #include <QMessageBox>
 #include <sstream>
+#include <qxmlstream.h>
 
 # pragma execution_character_set("utf-8")
 FileClassify::FileClassify(QWidget *parent)
@@ -70,6 +71,7 @@ void FileClassify::parRead(){
 		}
 		std::ifstream inStream(filename.toStdWString());
 		std::string info;
+		//--
 		while (inStream>>info){
 			if (isNum(info))	continue;
 			QFileInfo sInfo=QFileInfo(QString::fromStdString(info));
@@ -79,6 +81,42 @@ void FileClassify::parRead(){
 			inStream >> m;
 			if (!fileParameter.contains(sInfoName))		fileParameter[sInfoName].fill(-1, sz);
 			fileParameter[sInfoName][i] = abs(m);
+		}
+	}
+	ui.plainTextEdit->clear();
+	for (i = 0; i < fileParameter.size(); i++){
+		ui.plainTextEdit->appendPlainText(fileParameter.keys()[i]);
+	}
+}
+//云,侧摆角名字
+QString cloudNameInXml = "CloudPercent", SatelliteAngle = "YawSatelliteAngle";
+void FileClassify::parReadFromXml(){
+	int i, j, sz = clsRank.size();
+	QStringList attributeNames;
+	float m;
+	for (i = 0; i < sz; i++)
+		attributeNames.append(clsRank[i].clsName);
+	fileParameter.clear();
+	QFileInfoList folders = filePath.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
+	for (QFileInfo folder : folders){
+		QString xmlName(folder.absoluteFilePath()+'/'+folder.fileName()+"_gDosMeta.xml");
+		if (!QFile::exists(xmlName))
+			continue;
+		QXmlStreamReader xml(folder.absoluteFilePath()+"_gDosMeta.xml");
+		while (!xml.atEnd()){
+			xml.readNext();
+			QString name = xml.name().toString();
+			if (xml.name() == "elements")
+				auto xmlAttributes=xml.attributes();
+			if (xml.name() == "element"){
+				QString name = xml.attributes().value("name").toString();
+				if (attributeNames.count(name)){
+					j=attributeNames.indexOf(name);
+					if (!fileParameter.contains(name))		fileParameter[name].fill(-1, sz);
+					m = xml.readElementText().toFloat();
+					fileParameter[name][j] = abs(m);
+				}	
+			}
 		}
 	}
 	ui.plainTextEdit->clear();
@@ -97,7 +135,9 @@ void FileClassify::inputFilePath(){
 	filePath = productPath.absolutePath() + "/product/DOM";
 	ui.lineEdit_2->setText(filePath.absolutePath());
 	iniRead();
-	parRead();
+	if(inputWay==0)
+		parRead();
+	else parReadFromXml();
 }
 void FileClassify::outputFilePath(){
 	filePath = QFileDialog::getExistingDirectory(this, tr("输出路径"),filePath.absolutePath());
@@ -106,6 +146,8 @@ void FileClassify::outputFilePath(){
 		return;
 	}
 	ui.lineEdit_2->setText(filePath.absolutePath());
+	if (inputWay == 1)
+		parReadFromXml();
 }
 void FileClassify::inputIniPath(){
 	iniPath = QFileDialog::getOpenFileName(this, tr("配置文件名称"), filePath.absolutePath(),"*.ini");

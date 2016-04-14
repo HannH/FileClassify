@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>400</height>
+    <height>409</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,11 @@
      </widget>
     </item>
     <item row="1" column="0" colspan="4">
-     <widget class="QLineEdit" name="lineEdit_2"/>
+     <widget class="QLineEdit" name="lineEdit_2">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
     <item row="1" column="4">
      <widget class="QPushButton" name="pushButton_2">
@@ -47,10 +51,17 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
     <item row="0" column="0" colspan="4">
-     <widget class="QLineEdit" name="lineEdit"/>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
     <item row="6" column="0" colspan="5">
      <widget class="QPlainTextEdit" name="plainTextEdit">
@@ -59,6 +70,9 @@
         <horstretch>0</horstretch>
         <verstretch>20</verstretch>
        </sizepolicy>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -80,6 +94,13 @@
      <widget class="QPushButton" name="pushButton_3">
       <property name="text">
        <string>配置文件路径</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1" colspan="2">
+     <widget class="QCheckBox" name="checkBox_2">
+      <property name="text">
+       <string>通过产品xml读取</string>
       </property>
      </widget>
     </item>
@@ -188,6 +209,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBox_2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>FileClassifyClass</receiver>
+   <slot>xmlInput(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>352</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>392</x>
+     <y>362</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>inputFilePath()</slot>
@@ -196,5 +233,6 @@
   <slot>runClassify()</slot>
   <slot>changeSubFlag(bool)</slot>
   <slot>openIni()</slot>
+  <slot>xmlInput(bool)</slot>
  </slots>
 </ui>

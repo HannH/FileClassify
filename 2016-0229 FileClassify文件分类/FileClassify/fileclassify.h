@@ -37,6 +37,7 @@ private slots:
  	void inputIniPath();//配置文件路径
  	void runClassify();//进行分类
 	void changeSubFlag(bool a){	subDirFlag = a;}
+	void xmlInput(bool a){inputWay = a; };
 	void openIni(){	QProcess::execute("notepad " + iniPath);}
 private:
 	Ui::FileClassifyClass ui;
@@ -47,9 +48,10 @@ private:
 	QMap<QString, QVector<float>> fileParameter;//文件对应参数
 	//ini文件内读取参数
 	QVector<ClassificationConfig> clsRank;//每个类别中的相应等级
-	
+	bool inputWay=false;
 	void iniRead();
 	void parRead();
+	void parReadFromXml();
 	void subDirCreate(const QStringList&);
 };
 
