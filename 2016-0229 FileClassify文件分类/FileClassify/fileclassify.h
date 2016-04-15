@@ -33,7 +33,7 @@ public:
 	void getDirPath(QString path){ iniPath = path + "config.ini"; };
 protected:
 	void mousePressEvent(QMouseEvent *qm){
-		
+		pathDef();
 	}
 private slots:
 	void inputFilePath();//ÊäÈëÄ¿Â¼

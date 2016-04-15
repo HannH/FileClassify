@@ -21,9 +21,7 @@ FileClassify::~FileClassify()
 }
 void FileClassify::iniRead(){
 	if (!filePath.exists(iniPath))	{
-		QMessageBox::warning(this, "警告", "配置文件路径错误,请重试", QMessageBox::Ok);
 		return;
-	}
 	QSettings sets(iniPath, QSettings::IniFormat);
 	QStringList basicKey,childKey;
 	//读取对应分类名
@@ -65,7 +63,7 @@ void FileClassify::parRead(){
 	fileParameter.clear();
 	for (i = 0; i < sz; i++){
 		QString filename = productPath.absolutePath() +"/" + clsRank[i].clsName + ".txt";
-		if (!filePath.exists(filename))		{
+		if (!filePath.exists(filename))	{
 			QMessageBox::warning(this, "警告", filename+"路径错误,请检查后重试", QMessageBox::Ok);
 			return;
 		}
@@ -144,17 +142,28 @@ void FileClassify::pathDef(){
 		parRead();
 	else parReadFromXml();
 }
-void FileClassify::pathCheck(){
-	if(QFile::exists(filePath))
-
+bool FileClassify::pathCheck(){
+	if (!productPath.exists()) {
+		QMessageBox::warning(this, "警告", "工程文件路径错误,请重试", QMessageBox::Ok);
+		return false;
+	}
+	if (!filePath.exists()) {
+		QMessageBox::warning(this, "警告", "输出路径不存在,请重试", QMessageBox::Ok);
+		return false;
+	}
+	if (inputWay == false){
+		if (!filePath.exists(iniPath)) {
+			QMessageBox::warning(this, "警告", "输入路径不存在,请重试", QMessageBox::Ok);
+			return false;
+		}
+	}
+	
 }
 void FileClassify::inputFilePath(){
 //	productPath = QFileDialog::getExistingDirectory(this, tr("工程路径"),"J:\\YangtzeRiver_Prj");
 	productPath = QFileDialog::getExistingDirectory(this, tr("工程路径"), "E:\\苏州项目\\FileClassify\\测试工程");
-	if (!productPath.exists()) {
-		QMessageBox::warning(this, "警告", "工程文件路径错误,请重试", QMessageBox::Ok);
+	if (!productPath.exists())
 		return;
-	}
 	ui.lineEdit->setText(productPath.absolutePath());
 	filePath = productPath.absolutePath() + "/product/DOM";
 	ui.lineEdit_2->setText(filePath.absolutePath());
@@ -165,18 +174,14 @@ void FileClassify::inputFilePath(){
 }
 void FileClassify::outputFilePath(){
 	filePath = QFileDialog::getExistingDirectory(this, tr("输出路径"),"E:\\CodeLib\\2016-0229 FileClassify文件分类\\测试工程\\product\\DOM");
-	if (!filePath.exists()) {
-		QMessageBox::warning(this, "警告", "输出路径不存在,请重试", QMessageBox::Ok);
+	if (!filePath.exists())
 		return;
-	}
 	ui.lineEdit_2->setText(filePath.absolutePath());
 }
 void FileClassify::inputIniPath(){
 	iniPath = QFileDialog::getOpenFileName(this, tr("配置文件名称"), filePath.absolutePath(),"*.ini");
-	if (!filePath.exists(iniPath)) {
-		QMessageBox::warning(this, "警告", "输入路径不存在,请重试", QMessageBox::Ok);
+	if (!filePath.exists(iniPath)) 
 		return;
-	}
 	ui.lineEdit_3->setText(iniPath);
 }
 /*
@@ -210,6 +215,8 @@ void FileClassify::subDirCreate(const QStringList& rankName){
 		}
 }
 void FileClassify::runClassify(){
+	pathDef();
+	pathCheck();
 	int i=0, j,m=0;
 	QStringList rankName	= clsRank[0].rankName;
 	for (i = 0; i < rankName.size(); i++){
