@@ -22,13 +22,14 @@ FileClassify::~FileClassify()
 void FileClassify::iniRead(){
 	if (!filePath.exists(iniPath))	{
 		return;
+	}
 	QSettings sets(iniPath, QSettings::IniFormat);
-	QStringList basicKey,childKey;
+	QStringList basicKey, childKey;
 	//读取对应分类名
 	sets.beginGroup("basic");
 	basicKey = sets.childKeys();
 	sets.endGroup();
-	int i, j,sz = basicKey.size();
+	int i, j, sz = basicKey.size();
 	clsRank.resize(sz);
 	//读取分级表
 	for (i = 0; i < sz; i++){
@@ -141,10 +142,11 @@ void FileClassify::pathDef(){
 	if (inputWay == 0)
 		parRead();
 	else parReadFromXml();
+
 }
 bool FileClassify::pathCheck(){
-	if (!productPath.exists()) {
-		QMessageBox::warning(this, "警告", "工程文件路径错误,请重试", QMessageBox::Ok);
+	if (!filePath.exists(iniPath)) {
+		QMessageBox::warning(this, "警告", "输入路径不存在,请重试", QMessageBox::Ok);
 		return false;
 	}
 	if (!filePath.exists()) {
@@ -152,12 +154,12 @@ bool FileClassify::pathCheck(){
 		return false;
 	}
 	if (inputWay == false){
-		if (!filePath.exists(iniPath)) {
-			QMessageBox::warning(this, "警告", "输入路径不存在,请重试", QMessageBox::Ok);
+		if (!productPath.exists()) {
+			QMessageBox::warning(this, "警告", "工程文件路径错误,请重试", QMessageBox::Ok);
 			return false;
 		}
 	}
-	
+	return true;
 }
 void FileClassify::inputFilePath(){
 //	productPath = QFileDialog::getExistingDirectory(this, tr("工程路径"),"J:\\YangtzeRiver_Prj");
@@ -168,9 +170,6 @@ void FileClassify::inputFilePath(){
 	filePath = productPath.absolutePath() + "/product/DOM";
 	ui.lineEdit_2->setText(filePath.absolutePath());
 	iniRead();
-	if (inputWay == 0)
-		parRead();
-	else parReadFromXml();
 }
 void FileClassify::outputFilePath(){
 	filePath = QFileDialog::getExistingDirectory(this, tr("输出路径"),"E:\\CodeLib\\2016-0229 FileClassify文件分类\\测试工程\\product\\DOM");
@@ -216,9 +215,10 @@ void FileClassify::subDirCreate(const QStringList& rankName){
 }
 void FileClassify::runClassify(){
 	pathDef();
-	pathCheck();
+	if(pathCheck()==false)
+		return;
 	int i=0, j,m=0;
-	QStringList rankName	= clsRank[0].rankName;
+	QStringList rankName = clsRank[0].rankName;
 	for (i = 0; i < rankName.size(); i++){
 		rankName[i] = nameTrans(rankName[i]);
 		for (j = 0; j < clsRank.size(); j++)
