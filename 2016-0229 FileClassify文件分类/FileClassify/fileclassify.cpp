@@ -71,7 +71,6 @@ void FileClassify::parRead(){
 		}
 		std::ifstream inStream(filename.toStdWString());
 		std::string info;
-		//--
 		while (inStream>>info){
 			if (isNum(info))	continue;
 			QFileInfo sInfo=QFileInfo(QString::fromStdString(info));
@@ -99,22 +98,34 @@ void FileClassify::parReadFromXml(){
 	fileParameter.clear();
 	QFileInfoList folders = filePath.entryInfoList(QDir::Dirs|QDir::NoDotAndDotDot);
 	for (QFileInfo folder : folders){
-		QString xmlName(folder.absoluteFilePath()+'/'+folder.fileName()+"_gDosMeta.xml");
-		if (!QFile::exists(xmlName))
+		QDir imgDir(folder.absoluteFilePath());
+		QFile xmlName;
+		for (QFileInfo file : imgDir.entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot)){
+			QString filename = file.absoluteFilePath();
+			if (filename.count(QRegExp(".*MSS.*_gDosMeta.xml"))){
+				xmlName.setFileName(filename);
+				break;
+			}
+			else if (filename.count(QRegExp(".*_gDosMeta.xml"))){
+				xmlName.setFileName(filename);
+				break;
+			}
+		}
+		if(!xmlName.exists())
 			continue;
-		QXmlStreamReader xml(folder.absoluteFilePath()+"_gDosMeta.xml");
+		xmlName.open(QIODevice::ReadOnly | QIODevice::Text);
+		QXmlStreamReader xml(&xmlName);
 		while (!xml.atEnd()){
 			xml.readNext();
-			QString name = xml.name().toString();
-			if (xml.name() == "elements")
-				auto xmlAttributes=xml.attributes();
-			if (xml.name() == "element"){
+			if (xml.isStartElement() &&xml.name() == "element"){
 				QString name = xml.attributes().value("name").toString();
 				if (attributeNames.count(name)){
 					j=attributeNames.indexOf(name);
-					if (!fileParameter.contains(name))		fileParameter[name].fill(-1, sz);
+					//文件名为key
+					auto ImgName = folder.fileName();
+					if (!fileParameter.contains(ImgName))		fileParameter[ImgName].fill(-1, sz);
 					m = xml.readElementText().toFloat();
-					fileParameter[name][j] = abs(m);
+					fileParameter[ImgName][j] = abs(m);
 				}	
 			}
 		}
@@ -123,6 +134,19 @@ void FileClassify::parReadFromXml(){
 	for (i = 0; i < fileParameter.size(); i++){
 		ui.plainTextEdit->appendPlainText(fileParameter.keys()[i]);
 	}
+}
+void FileClassify::pathDef(){
+	productPath = ui.lineEdit->text();
+	filePath = ui.lineEdit_2->text();
+	iniPath = ui.lineEdit_3->text();
+	iniRead();
+	if (inputWay == 0)
+		parRead();
+	else parReadFromXml();
+}
+void FileClassify::pathCheck(){
+	if(QFile::exists(filePath))
+
 }
 void FileClassify::inputFilePath(){
 //	productPath = QFileDialog::getExistingDirectory(this, tr("工程路径"),"J:\\YangtzeRiver_Prj");
@@ -135,19 +159,17 @@ void FileClassify::inputFilePath(){
 	filePath = productPath.absolutePath() + "/product/DOM";
 	ui.lineEdit_2->setText(filePath.absolutePath());
 	iniRead();
-	if(inputWay==0)
+	if (inputWay == 0)
 		parRead();
 	else parReadFromXml();
 }
 void FileClassify::outputFilePath(){
-	filePath = QFileDialog::getExistingDirectory(this, tr("输出路径"),filePath.absolutePath());
+	filePath = QFileDialog::getExistingDirectory(this, tr("输出路径"),"E:\\CodeLib\\2016-0229 FileClassify文件分类\\测试工程\\product\\DOM");
 	if (!filePath.exists()) {
 		QMessageBox::warning(this, "警告", "输出路径不存在,请重试", QMessageBox::Ok);
 		return;
 	}
 	ui.lineEdit_2->setText(filePath.absolutePath());
-	if (inputWay == 1)
-		parReadFromXml();
 }
 void FileClassify::inputIniPath(){
 	iniPath = QFileDialog::getOpenFileName(this, tr("配置文件名称"), filePath.absolutePath(),"*.ini");

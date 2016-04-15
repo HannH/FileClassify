@@ -31,6 +31,10 @@ public:
 	};
 	~FileClassify();
 	void getDirPath(QString path){ iniPath = path + "config.ini"; };
+protected:
+	void mousePressEvent(QMouseEvent *qm){
+		
+	}
 private slots:
 	void inputFilePath();//输入目录
  	void outputFilePath();//输出目录
@@ -53,6 +57,8 @@ private:
 	void parRead();
 	void parReadFromXml();
 	void subDirCreate(const QStringList&);
+	void pathDef();
+	bool pathCheck();
 };
 
 #endif // FILECLASSIFY_H
