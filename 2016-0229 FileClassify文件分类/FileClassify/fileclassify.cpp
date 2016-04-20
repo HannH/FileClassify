@@ -8,6 +8,9 @@
 #include <QMessageBox>
 #include <sstream>
 #include <qxmlstream.h>
+#include <windows.h>
+#include <Shlwapi.h>
+
 
 # pragma execution_character_set("utf-8")
 FileClassify::FileClassify(QWidget *parent)
@@ -190,15 +193,23 @@ bool creatFolder(const char *destdir){
 	strcat(cmd, destdir);
 	return !system(cmd);
 }*/
+std::wstring pathTrans(const char *path){
+	QString name = QDir::toNativeSeparators(QString::fromLocal8Bit(path));
+	std::wstring ws = name.toStdWString();
+	ws.push_back('\0');
+	ws.push_back('\0');
+	return ws;
+}
 //移动文件夹(成功返回true)
-bool moveFolder(const char* srcdir,const char* destdir){
-	QDir ttemp = QString(destdir);
-//	if (!ttemp.exists())	creatFolder(destdir);
-	char cmd[1024] = "cmd /c move ";
-	strcat(cmd, srcdir);
-	strcat(cmd, " ");
-	strcat(cmd, destdir);
-	return !WinExec((LPCSTR)cmd, SW_HIDE);
+int moveFolder(const char* srcdir, const char* destdir){
+	std::wstring ws(pathTrans(srcdir)), wd(pathTrans(destdir));
+	SHFILEOPSTRUCT FileOp;
+	FileOp.hwnd = 0;
+	FileOp.wFunc = FO_MOVE; //执行文件拷贝
+	FileOp.pFrom = ws.c_str();
+	FileOp.pTo = wd.c_str();
+	FileOp.fFlags = FOF_NO_UI;
+	return SHFileOperation(&FileOp);
 }
 QString nameTrans(const QString &name){
 	int i;

@@ -9,7 +9,6 @@
 #include <QtCore/QStringList>
 #include <QDir>
 #include <QProcess>
-#include <cpl_win32ce_api.h>
 #include "ui_fileclassify.h"
 struct ClassificationConfig
 {
