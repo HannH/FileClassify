@@ -31,24 +31,26 @@ public:
 	~FileClassify();
 	void getDirPath(QString path){ iniPath = path + "config.ini"; };
 protected:
-	void mousePressEvent(QMouseEvent *qm){
-		pathDef();
-	}
+
 private slots:
 	void inputFilePath();//输入目录
  	void outputFilePath();//输出目录
  	void inputIniPath();//配置文件路径
  	void runClassify();//进行分类
-	void changeSubFlag(bool a){	subDirFlag = a;}
+	void undo();//撤销
+	void changeSubFlag(bool a){	onlyReport = a;}
+	void inBigLevel(bool a){ isBigLevel = a; }
 	void xmlInput(bool a){inputWay = a; };
 	void openIni(){	QProcess::execute("notepad " + iniPath);}
+	void pathDef();
 private:
 	Ui::FileClassifyClass ui;
-	bool subDirFlag;
+	bool onlyReport=false,isBigLevel=false;
 	QDir productPath;//工程目录
 	QDir filePath;//待分类文件目录
 	QString iniPath;//配置文件路径
-	QMap<QString, QVector<float>> fileParameter;//文件对应参数
+	QString m_clsName;//决定的分类名
+	QMap<QString, QVector<QString>> fileParameter;//文件对应参数
 	//ini文件内读取参数
 	QVector<ClassificationConfig> clsRank;//每个类别中的相应等级
 	bool inputWay=false;
@@ -56,7 +58,6 @@ private:
 	void parRead();
 	void parReadFromXml();
 	void subDirCreate(const QStringList&);
-	void pathDef();
 	bool pathCheck();
 };
 
