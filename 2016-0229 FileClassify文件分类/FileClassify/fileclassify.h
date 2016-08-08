@@ -9,6 +9,7 @@
 #include <QtCore/QStringList>
 #include <QDir>
 #include <QProcess>
+#include <vector>
 #include "ui_fileclassify.h"
 struct ClassificationConfig
 {
@@ -50,6 +51,12 @@ private:
 	QDir filePath;//待分类文件目录
 	QString iniPath;//配置文件路径
 	QString m_clsName;//决定的分类名
+	//名称替换搜寻参数
+	bool m_renameNeedReplace = false;
+	QString m_renameSplitChar,m_renameAppend;//分隔符
+	std::vector<int> m_renameDstSeq;//名称顺序
+	bool m_renameReplaceDot;//是否替换.
+
 	QMap<QString, QVector<QString>> fileParameter;//文件对应参数
 	//ini文件内读取参数
 	QVector<ClassificationConfig> clsRank;//每个类别中的相应等级
@@ -58,6 +65,7 @@ private:
 	void parRead();
 	void parReadFromXml();
 	void subDirCreate(const QStringList&);
+	void nameReplace();
 	bool pathCheck();
 };
 

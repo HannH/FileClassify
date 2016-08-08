@@ -29,6 +29,25 @@ void FileClassify::iniRead(){
 	}
 	QSettings sets(iniPath, QSettings::IniFormat);
 	QStringList childKey, numKey;
+
+	//读取命名规则
+	sets.beginGroup("ProductNameRule");
+	QString t_value;
+	t_value=sets.value("srcSplitBy").toString();
+	m_renameSplitChar = t_value;
+	t_value=sets.value("dstNameSequence").toString();
+	if (t_value.size())
+		m_renameNeedReplace = true;
+	m_renameDstSeq.resize(t_value.size());
+	for (int i = 0; i < t_value.size(); i++){
+		m_renameDstSeq[i] = t_value[i].digitValue();
+	}
+	t_value=sets.value("DotOrD").toString();
+	m_renameReplaceDot = t_value.toInt();
+	t_value = sets.value("append").toString();
+	m_renameAppend = t_value;
+	sets.endGroup();
+
 	//读取对应分类名
 	sets.beginGroup("basic");
 	childKey = sets.childKeys();
@@ -153,7 +172,8 @@ void FileClassify::pathDef(){
 	if (inputWay == 0)
 		parRead();
 	else parReadFromXml();
-
+	if (m_renameNeedReplace)
+		nameReplace(), m_renameNeedReplace = false;
 }
 bool FileClassify::pathCheck(){
 	if (!filePath.exists(iniPath)) {
@@ -285,13 +305,11 @@ void FileClassify::runClassify(){
 		QString clsName;
 		i = 0, j = 0;
 		bool flag = false, haveCls = false;
-		if (!m_clsName.isEmpty()){
-			for (i = 0; i < ite->size(); i++)
-				if (ite->at(i).contains("level=")){
-					QString nn = (*ite)[i];
-					clsName = nn.replace("level=", ""), haveCls = true;
-				}
-		}
+		for (i = 0; i < ite->size(); i++)
+			if (ite->at(i).contains("level=")){
+				QString nn = (*ite)[i];
+				clsName = nn.replace("level=", ""), haveCls = true;
+			}
 		//深度优先搜素
 		else while (j < rankName.size()){
 			if (abs(ite->at(i).toFloat()) >= clsRank[i].minValue[j] && abs(ite->at(i).toFloat()) < clsRank[i].maxValue[j])
@@ -321,7 +339,7 @@ void FileClassify::runClassify(){
 			else {
 				for (int kk = 0; kk < ite->size()-1;kk++)
 					text_stream << "  " << ite->at(kk).toLocal8Bit();
-				text_stream << "  " << clsName[j] << endl;
+				text_stream << "  " << clsName << endl;
 			}
 			if (flag == false)	{
 				if (onlyReport == false)
@@ -362,13 +380,11 @@ void FileClassify::undo(){
 		QString clsName;
 		i = 0, j = 0;
 		bool flag = false, haveCls = false;
-		if (!m_clsName.isEmpty()){
-			for (i = 0; i < ite->size(); i++)
-				if (ite->at(i).contains("level=")){
-					QString nn = (*ite)[i];
-					clsName = nn.replace("level=", ""), haveCls = true;
-				}
-		}
+		for (i = 0; i < ite->size(); i++)
+			if (ite->at(i).contains("level=")){
+				QString nn = (*ite)[i];
+				clsName = nn.replace("level=", ""), haveCls = true;
+			}
 		//深度优先搜素
 		else while (j < rankName.size()){
 			if (abs(ite->at(i).toFloat()) >= clsRank[i].minValue[j] && abs(ite->at(i).toFloat()) < clsRank[i].maxValue[j])
@@ -399,4 +415,22 @@ void FileClassify::undo(){
 	qDebug() << "-----------------------end------------------------" << endl;
 	ui.progressBar->setValue(100);
 	QMessageBox::information(this, "提示", "重做完成!", QMessageBox::Ok);
+}
+void FileClassify::nameReplace(){
+	int j = 0;
+	for (auto ite = fileParameter.begin(); ite != fileParameter.end(); ite++,j++){
+		QString t_nameRef = ite.key();
+		QVector<QString> t_value = *ite;
+		fileParameter.remove(t_nameRef);
+		QStringList t_srcNameList = t_nameRef.split(m_renameSplitChar),t_dstNameList;
+		for (int i = 0; i < m_renameDstSeq.size(); i++){
+			if (m_renameReplaceDot)
+				t_srcNameList[m_renameDstSeq[i]].replace("\.", "D");
+			t_dstNameList << t_srcNameList[m_renameDstSeq[i]];
+		}
+		t_dstNameList << m_renameAppend;
+		t_nameRef = t_dstNameList.join(m_renameSplitChar);
+		fileParameter[t_nameRef] = t_value;
+		ite = fileParameter.begin() + j;
+	}
 }
